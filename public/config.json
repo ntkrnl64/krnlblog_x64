@@ -1,0 +1,18 @@
+{
+  "title": "KrnlBlog X64",
+  "description": "Krnl's Fluent Blog",
+  "icon": "/avatar.png",
+  "author": {
+    "name": "NtKrnl64",
+    "bio": "Developerr",
+    "avatar": "/avatar.png",
+    "email": "nt@krnl64.win",
+    "social": {
+      "github": "https://github.com/ntkrnl64"
+    }
+  },
+  "footer": "Powered by React + Fluent UI + Vite | Copyleft 2025 NtKrnl64, under CC BY-NC-SA 4.0 License.",
+  "aboutMenuHref": "/about",
+  "defaultTheme": "auto",
+  "postsPerPage": 10
+}
