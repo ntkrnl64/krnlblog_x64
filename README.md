@@ -1,6 +1,6 @@
 # KrnlBlog X64
 
-a static fluent blog system.
+a static fluent blog system, built with vite + react.
 
 ## License
 
