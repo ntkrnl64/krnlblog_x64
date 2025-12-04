@@ -6,8 +6,6 @@ publishedAt: 2025-11-27
 tags: ["Tech", "Blog"]
 ---
 
-# 欢迎使用 KrnlBlog X64
-
 这是一个使用 **Fluent UI** 和 **React** 构建的现代化博客系统。
 
 ## 开始使用
