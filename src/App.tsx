@@ -11,25 +11,28 @@ import NotFound from "./pages/NotFound";
 import Page from "./pages/Page";
 import SearchPage from "./pages/Search";
 import { TocProvider } from "./contexts/TocContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 
 function App() {
   return (
     <BrowserRouter>
-      <TocProvider>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/post/:slug" element={<Post />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/archive" element={<Archive />} />
-            <Route path="/tag/:tagName" element={<Tag />} />
-            <Route path="/group/:groupName" element={<Group />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/:slug" element={<Page />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Layout>
-      </TocProvider>
+      <ThemeProvider>
+        <TocProvider>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/post/:slug" element={<Post />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/archive" element={<Archive />} />
+              <Route path="/tag/:tagName" element={<Tag />} />
+              <Route path="/group/:groupName" element={<Group />} />
+              <Route path="/search" element={<SearchPage />} />
+              <Route path="/:slug" element={<Page />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Layout>
+        </TocProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

@@ -3,6 +3,7 @@ import { getPostBySlug } from "../lib/content";
 import { useEffect, useState, useRef, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { highlightAllCodeBlocks } from "../lib/highlight";
+import GiscusComments from "../components/Giscus.tsx";
 import NotFound from "./NotFound.tsx";
 import { useToc } from "../contexts/TocContext";
 
@@ -216,6 +217,7 @@ export default function Post() {
         style={{ marginTop: tokens.spacingVerticalL }}
         dangerouslySetInnerHTML={{ __html: htmlWithAnchors }}
       />
+      <GiscusComments />
     </div>
   );
 }

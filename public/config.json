@@ -14,5 +14,11 @@
   "footer": "Powered by React + Fluent UI + Vite | Copyleft 2025 NtKrnl64, under CC BY-NC-SA 4.0 License.",
   "aboutMenuHref": "/about",
   "defaultTheme": "auto",
-  "postsPerPage": 10
+  "postsPerPage": 10,
+  "giscus": {
+    "repo": "ntkrnl64/krnlblog_x64",
+    "repoId": "R_kgDOQeOHMg",
+    "category": "Announcements",
+    "categoryId": "DIC_kwDOQeOHMs4CzZDT"
+  }
 }

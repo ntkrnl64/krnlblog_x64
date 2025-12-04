@@ -55,6 +55,7 @@ import { useLocation } from "react-router-dom";
 import { getNotice } from "../lib/content";
 import RenderedPage from "./RenderedPage";
 import { useToc } from "../contexts/TocContext";
+import { useTheme } from "../contexts/ThemeContext";
 
 // 判断是否为手机端
 function useIsMobile() {
@@ -255,20 +256,7 @@ export function Layout({ children }: PropsWithChildren) {
     null,
   );
   const { toc } = useToc();
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    try {
-      const saved = localStorage.getItem("theme");
-      if (saved === "dark") return true;
-      if (saved === "light") return false;
-    } catch {
-      // ignore
-    }
-    return (
-      typeof window !== "undefined" &&
-      window.matchMedia &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches
-    );
-  });
+  const { isDark, toggleTheme } = useTheme();
   const [ctx, setCtx] = useState<{ open: boolean; x: number; y: number }>({
     open: false,
     x: 0,
@@ -283,14 +271,6 @@ export function Layout({ children }: PropsWithChildren) {
       : location.pathname.startsWith("/about")
         ? "about"
         : "home";
-
-  useEffect(() => {
-    try {
-      localStorage.setItem("theme", isDark ? "dark" : "light");
-    } catch {
-      // ignore
-    }
-  }, [isDark]);
 
   // 设置页面标题
   useEffect(() => {
@@ -666,7 +646,7 @@ export function Layout({ children }: PropsWithChildren) {
                 <Button
                   appearance="subtle"
                   onClick={() => {
-                    setIsDark((v) => !v);
+                    toggleTheme();
                     setIsDrawerOpen(false);
                   }}
                   style={{ width: "100%", justifyContent: "flex-start" }}
@@ -689,7 +669,7 @@ export function Layout({ children }: PropsWithChildren) {
               style={{ left: ctx.x, top: ctx.y }}
               onClick={closeContextMenu}
             >
-              <Button appearance="subtle" onClick={() => setIsDark((v) => !v)}>
+              <Button appearance="subtle" onClick={() => toggleTheme()}>
                 切换深浅色
               </Button>
             </div>
