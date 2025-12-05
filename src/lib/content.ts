@@ -1,8 +1,10 @@
 import matter from "gray-matter";
 import { marked } from "marked";
 import { Buffer } from "buffer";
-// @ts-expect-error - Buffer polyfill for browser
-window.Buffer = window.Buffer || Buffer;
+if (typeof window !== "undefined") {
+  // @ts-expect-error - Buffer polyfill for browser
+  window.Buffer = window.Buffer || Buffer;
+}
 
 // 配置 marked 选项
 marked.setOptions({
