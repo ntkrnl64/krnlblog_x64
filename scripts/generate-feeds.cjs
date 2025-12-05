@@ -7,9 +7,7 @@ const config = require("../public/config.json");
 
 async function generate() {
   const contentDir = path.resolve(__dirname, "../content");
-  console.log("Content directory:", contentDir);
   const files = glob.sync("*.md", { cwd: contentDir });
-  console.log("Found files:", files.length);
 
   const posts = [];
 
@@ -31,7 +29,6 @@ async function generate() {
     }
   }
 
-  console.log("Found posts:", posts.length);
   posts.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
 
   // RSS Feed
@@ -61,9 +58,8 @@ async function generate() {
   }
 
   const xml = feed.xml({ indent: true });
-  console.log("Generated XML length:", xml.length);
+
   fs.writeFileSync(path.resolve(__dirname, "../public/rss.xml"), xml);
-  console.log("Wrote rss.xml to public directory");
 
 }
 

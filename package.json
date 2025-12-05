@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "pnpm generate-feeds && tsc -b && vite build",
+    "build": "pnpm generate-feeds && pnpm generate-sitemap && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generate-feeds": "node scripts/generate-feeds.cjs"
+    "generate-feeds": "node scripts/generate-feeds.cjs",
+    "generate-sitemap": "vite-node scripts/generate-sitemap.ts"
   },
   "dependencies": {
     "@fluentui/react-components": "^9.72.7",
@@ -45,6 +46,7 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
     "vite": "^7.2.4",
-    "vite-node": "^5.2.0"
+    "vite-node": "^5.2.0",
+    "xmlbuilder2": "^4.0.3"
   }
 }
