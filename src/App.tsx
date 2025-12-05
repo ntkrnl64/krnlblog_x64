@@ -1,5 +1,5 @@
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import Home from "./pages/Home";
 import Post from "./pages/Post";
@@ -12,29 +12,102 @@ import Page from "./pages/Page";
 import SearchPage from "./pages/Search";
 import { TocProvider } from "./contexts/TocContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { AnimatePresence } from "framer-motion";
+import { AnimatedPage } from "./components/AnimatedPage";
+import NProgress from "nprogress";
+import { useEffect } from "react";
 
 function App() {
+  const location = useLocation();
+  useEffect(() => {
+    NProgress.done();
+  }, [location.pathname]);
+
   return (
-    <BrowserRouter>
-      <ThemeProvider>
-        <TocProvider>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/post/:slug" element={<Post />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/archive" element={<Archive />} />
-              <Route path="/tag/:tagName" element={<Tag />} />
-              <Route path="/group/:groupName" element={<Group />} />
-              <Route path="/search" element={<SearchPage />} />
-              <Route path="/:slug" element={<Page />} />
-              <Route path="*" element={<NotFound />} />
+    <ThemeProvider>
+      <TocProvider>
+        <Layout>
+          <AnimatePresence mode="wait">
+            <Routes location={location} key={location.pathname}>
+              <Route
+                path="/"
+                element={
+                  <AnimatedPage>
+                    <Home />
+                  </AnimatedPage>
+                }
+              />
+              <Route
+                path="/post/:slug"
+                element={
+                  <AnimatedPage>
+                    <Post />
+                  </AnimatedPage>
+                }
+              />
+              <Route
+                path="/about"
+                element={
+                  <AnimatedPage>
+                    <About />
+                  </AnimatedPage>
+                }
+              />
+              <Route
+                path="/archive"
+                element={
+                  <AnimatedPage>
+                    <Archive />
+                  </AnimatedPage>
+                }
+              />
+              <Route
+                path="/tag/:tagName"
+                element={
+                  <AnimatedPage>
+                    <Tag />
+                  </AnimatedPage>
+                }
+              />
+              <Route
+                path="/group/:groupName"
+                element={
+                  <AnimatedPage>
+                    <Group />
+                  </AnimatedPage>
+                }
+              />
+              <Route
+                path="/search"
+                element={
+                  <AnimatedPage>
+                    <SearchPage />
+                  </AnimatedPage>
+                }
+              />
+              <Route
+                path="/:slug"
+                element={
+                  <AnimatedPage>
+                    <Page />
+                  </AnimatedPage>
+                }
+              />
+              <Route
+                path="*"
+                element={
+                  <AnimatedPage>
+                    <NotFound />
+                  </AnimatedPage>
+                }
+              />
             </Routes>
-          </Layout>
-        </TocProvider>
-      </ThemeProvider>
-    </BrowserRouter>
+          </AnimatePresence>
+        </Layout>
+      </TocProvider>
+    </ThemeProvider>
   );
 }
 
 export default App;
+

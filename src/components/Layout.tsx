@@ -41,7 +41,6 @@ import {
   TabList,
   Tab,
   makeStyles,
-  Link,
   Button,
   Drawer,
   DrawerHeader,
@@ -51,11 +50,12 @@ import {
 import { Navigation20Regular, Dismiss24Regular } from "@fluentui/react-icons";
 import type { PropsWithChildren } from "react";
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getNotice } from "../lib/content";
 import RenderedPage from "./RenderedPage";
 import { useToc } from "../contexts/TocContext";
 import { useTheme } from "../contexts/ThemeContext";
+import { delayedNavigate } from "../lib/navigation";
 
 // 判断是否为手机端
 function useIsMobile() {
@@ -244,6 +244,7 @@ export function Layout({ children }: PropsWithChildren) {
   const styles = useStyles();
   const isMobile = useIsMobile();
   const location = useLocation();
+  const navigate = useNavigate();
   const [site, setSite] = useState<{
     title?: string;
     description?: string;
@@ -376,27 +377,42 @@ export function Layout({ children }: PropsWithChildren) {
             <div className={styles.desktopNav}>
               <TabList selectedValue={currentTab}>
                 <Tab value="home">
-                  <Link className={styles.navLink} href="/">
+                  <a
+                    className={styles.navLink}
+                    href="/"
+                    onClick={(e) => delayedNavigate(navigate, "/", e)}
+                  >
                     首页
-                  </Link>
+                  </a>
                 </Tab>
                 <Tab value="archive">
-                  <Link className={styles.navLink} href="/archive">
+                  <a
+                    className={styles.navLink}
+                    href="/archive"
+                    onClick={(e) => delayedNavigate(navigate, "/archive", e)}
+                  >
                     归档
-                  </Link>
+                  </a>
                 </Tab>
                 <Tab value="search">
-                  <Link className={styles.navLink} href="/search">
+                  <a
+                    className={styles.navLink}
+                    href="/search"
+                    onClick={(e) => delayedNavigate(navigate, "/search", e)}
+                  >
                     搜索
-                  </Link>
+                  </a>
                 </Tab>
                 <Tab value="about">
-                  <Link
+                  <a
                     className={styles.navLink}
                     href={site?.aboutMenuHref || "/about"}
+                    onClick={(e) =>
+                      delayedNavigate(navigate, site?.aboutMenuHref || "/about", e)
+                    }
                   >
                     关于
-                  </Link>
+                  </a>
                 </Tab>
               </TabList>
             </div>
@@ -610,29 +626,49 @@ export function Layout({ children }: PropsWithChildren) {
             <nav className={styles.drawerNav}>
               <a
                 href="/"
-                className={`${styles.drawerNavItem} ${currentTab === "home" ? styles.drawerNavItemActive : ""}`}
-                onClick={() => setIsDrawerOpen(false)}
+                className={`${styles.drawerNavItem} ${
+                  currentTab === "home" ? styles.drawerNavItemActive : ""
+                }`}
+                onClick={(e) => {
+                  delayedNavigate(navigate, "/", e);
+                  setIsDrawerOpen(false);
+                }}
               >
                 🏠 首页
               </a>
               <a
                 href="/archive"
-                className={`${styles.drawerNavItem} ${currentTab === "archive" ? styles.drawerNavItemActive : ""}`}
-                onClick={() => setIsDrawerOpen(false)}
+                className={`${styles.drawerNavItem} ${
+                  currentTab === "archive" ? styles.drawerNavItemActive : ""
+                }`}
+                onClick={(e) => {
+                  delayedNavigate(navigate, "/archive", e);
+                  setIsDrawerOpen(false);
+                }}
               >
                 📚 归档
               </a>
               <a
                 href="/search"
-                className={`${styles.drawerNavItem} ${currentTab === "search" ? styles.drawerNavItemActive : ""}`}
-                onClick={() => setIsDrawerOpen(false)}
+                className={`${styles.drawerNavItem} ${
+                  currentTab === "search" ? styles.drawerNavItemActive : ""
+                }`}
+                onClick={(e) => {
+                  delayedNavigate(navigate, "/search", e);
+                  setIsDrawerOpen(false);
+                }}
               >
                 🔍 搜索
               </a>
               <a
                 href={site?.aboutMenuHref || "/about"}
-                className={`${styles.drawerNavItem} ${currentTab === "about" ? styles.drawerNavItemActive : ""}`}
-                onClick={() => setIsDrawerOpen(false)}
+                className={`${styles.drawerNavItem} ${
+                  currentTab === "about" ? styles.drawerNavItemActive : ""
+                }`}
+                onClick={(e) => {
+                  delayedNavigate(navigate, site?.aboutMenuHref || "/about", e);
+                  setIsDrawerOpen(false);
+                }}
               >
                 ℹ️ 关于
               </a>

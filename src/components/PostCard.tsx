@@ -6,6 +6,8 @@ import {
   makeStyles,
 } from "@fluentui/react-components";
 import type { PostMeta } from "../lib/content";
+import { useNavigate } from "react-router-dom";
+import { delayedNavigate } from "../lib/navigation";
 
 const useStyles = makeStyles({
   card: {
@@ -66,6 +68,7 @@ export default function PostCard({
   formatDate,
 }: PostCardProps) {
   const styles = useStyles();
+  const navigate = useNavigate();
   const dateStr =
     showDate && post.publishedAt
       ? formatDate
@@ -78,6 +81,7 @@ export default function PostCard({
       href={`/post/${post.slug}`}
       style={{ textDecoration: "none", color: "inherit" }}
       tabIndex={0}
+      onClick={(e) => delayedNavigate(navigate, `/post/${post.slug}`, e)}
     >
       <Card className={styles.card} tabIndex={-1}>
         <Title3 className={styles.titleText}>{post.title}</Title3>
