@@ -16,6 +16,7 @@ import { AnimatePresence } from "framer-motion";
 import { AnimatedPage } from "./components/AnimatedPage";
 import NProgress from "nprogress";
 import { useEffect } from "react";
+import DebugLoader from "./components/DebugLoader"; // Import the new debug loader component
 
 function App() {
   const location = useLocation();
@@ -90,6 +91,15 @@ function App() {
                 element={
                   <AnimatedPage>
                     <Page />
+                  </AnimatedPage>
+                }
+              />
+              {/* New debug route for loader */}
+              <Route
+                path="/debug/loader"
+                element={
+                  <AnimatedPage>
+                    <DebugLoader />
                   </AnimatedPage>
                 }
               />

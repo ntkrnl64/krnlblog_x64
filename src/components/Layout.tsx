@@ -56,6 +56,7 @@ import RenderedPage from "./RenderedPage";
 import { useToc } from "../contexts/TocContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { delayedNavigate } from "../lib/navigation";
+import Loader from "./Loader";
 
 // 判断是否为手机端
 function useIsMobile() {
@@ -264,6 +265,7 @@ export function Layout({ children }: PropsWithChildren) {
     y: 0,
   });
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const currentTab = location.pathname.startsWith("/archive")
     ? "archive"
@@ -334,8 +336,11 @@ export function Layout({ children }: PropsWithChildren) {
       }
     };
 
-    void loadConfig();
-    loadNotice();
+    Promise.allSettled([loadConfig(), Promise.resolve(loadNotice())]).finally(
+      () => {
+        setIsLoading(false);
+      },
+    );
   }, []);
 
   const handleContextMenu = (e: React.MouseEvent) => {
@@ -353,365 +358,402 @@ export function Layout({ children }: PropsWithChildren) {
         className={styles.root}
         onContextMenu={handleContextMenu}
       >
-        <header className={styles.header}>
-          <div className={styles.headerTop} style={{ position: "relative" }}>
-            {isMobile && (
-              <Button
-                appearance="subtle"
-                icon={<Navigation20Regular />}
-                onClick={() => setIsDrawerOpen(true)}
-                className={styles.mobileMenuButton}
-                aria-label="打开菜单"
-              />
-            )}
-            <div className={styles.titleRow} style={{ width: "100%" }}>
-              <div className={styles.title}>
-                {site?.title ?? "KrnlBlog X64"}
-              </div>
-            </div>
-            {site?.description && (
-              <div className={styles.desc}>{site.description}</div>
-            )}
-          </div>
-          <div className={styles.navBelow}>
-            <div className={styles.desktopNav}>
-              <TabList selectedValue={currentTab}>
-                <Tab value="home">
-                  <a
-                    className={styles.navLink}
-                    href="/"
-                    onClick={(e) => delayedNavigate(navigate, "/", e)}
-                  >
-                    首页
-                  </a>
-                </Tab>
-                <Tab value="archive">
-                  <a
-                    className={styles.navLink}
-                    href="/archive"
-                    onClick={(e) => delayedNavigate(navigate, "/archive", e)}
-                  >
-                    归档
-                  </a>
-                </Tab>
-                <Tab value="search">
-                  <a
-                    className={styles.navLink}
-                    href="/search"
-                    onClick={(e) => delayedNavigate(navigate, "/search", e)}
-                  >
-                    搜索
-                  </a>
-                </Tab>
-                <Tab value="about">
-                  <a
-                    className={styles.navLink}
-                    href={site?.aboutMenuHref || "/about"}
-                    onClick={(e) =>
-                      delayedNavigate(navigate, site?.aboutMenuHref || "/about", e)
-                    }
-                  >
-                    关于
-                  </a>
-                </Tab>
-              </TabList>
-            </div>
-          </div>
-        </header>
-
-        <main className={styles.mainWrap}>
-          <div className={styles.container}>{children}</div>
-          {!isMobile && (
-            <aside className={styles.sidebar}>
-              {/* 目录 */}
-              {toc.length > 0 && (
-                <section
-                  style={{
-                    marginBottom: 32,
-                    paddingBottom: 20,
-                    borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: 16,
-                      fontWeight: 600,
-                      marginBottom: 12,
-                      color: tokens.colorBrandForeground1,
-                    }}
-                  >
-                    📑 目录
-                  </div>
-                  <nav>
-                    <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
-                      {toc.map((item) => (
-                        <li
-                          key={item.id}
-                          style={{
-                            marginLeft: (item.level - 2) * 12,
-                            marginTop: 6,
-                          }}
-                        >
-                          <a
-                            href={`#${item.id}`}
-                            style={{
-                              color: tokens.colorNeutralForeground2,
-                              textDecoration: "none",
-                              fontSize: 14,
-                              display: "block",
-                              transition: "color 0.2s",
-                            }}
-                            onMouseEnter={(e) =>
-                              (e.currentTarget.style.color =
-                                tokens.colorBrandForeground1)
-                            }
-                            onMouseLeave={(e) =>
-                              (e.currentTarget.style.color =
-                                tokens.colorNeutralForeground2)
-                            }
-                          >
-                            {item.text}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </nav>
-                </section>
-              )}
-
-              {/* 作者信息块 */}
-              {site?.author && (
-                <section
-                  style={{
-                    marginBottom: 32,
-                    paddingBottom: 20,
-                    borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
-                  }}
-                >
-                  <div
-                    style={{ display: "flex", alignItems: "center", gap: 12 }}
-                  >
-                    <img
-                      src={site.author.avatar || site.icon || "/vite.svg"}
-                      alt="avatar"
-                      style={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: "50%",
-                        objectFit: "cover",
-                      }}
-                    />
-                    <div>
-                      <div style={{ fontWeight: 600 }}>{site.author.name}</div>
-                      <div
-                        style={{
-                          fontSize: 13,
-                          color: tokens.colorNeutralForeground3,
-                        }}
-                      >
-                        {site.author.bio}
-                      </div>
-                    </div>
-                  </div>
-                </section>
-              )}
-
-              {/* 公告块 */}
-              <section style={{ marginBottom: 32, paddingBottom: 20 }}>
-                <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>
-                  📢 公告
-                </div>
-                <div style={{ fontSize: 14 }}>
-                  <RenderedPage html={notice?.html || ""} />
-                </div>
-              </section>
-            </aside>
-          )}
-        </main>
-
-        {isMobile && (
-          <div
-            style={{
-              maxWidth: 600,
-              margin: "0 auto",
-              width: "100%",
-              padding: "16px 0",
-            }}
-          >
-            <div
-              style={{
-                background: tokens.colorNeutralBackground2,
-                borderRadius: 12,
-                boxShadow: tokens.shadow8,
-                padding: 20,
-                margin: "0 16px",
-              }}
-            >
-              {site?.author && (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 12,
-                    marginBottom: 16,
-                    borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
-                    paddingBottom: 12,
-                  }}
-                >
-                  <img
-                    src={site.author.avatar || site.icon || "/vite.svg"}
-                    alt="avatar"
-                    style={{
-                      width: 48,
-                      height: 48,
-                      borderRadius: "50%",
-                      objectFit: "cover",
-                    }}
+        {isLoading ? (
+          <Loader />
+        ) : (
+          <>
+            <header className={styles.header}>
+              <div className={styles.headerTop} style={{ position: "relative" }}>
+                {isMobile && (
+                  <Button
+                    appearance="subtle"
+                    icon={<Navigation20Regular />}
+                    onClick={() => setIsDrawerOpen(true)}
+                    className={styles.mobileMenuButton}
+                    aria-label="打开菜单"
                   />
-                  <div>
-                    <div style={{ fontWeight: 600 }}>{site.author.name}</div>
-                    <div
+                )}
+                <div className={styles.titleRow} style={{ width: "100%" }}>
+                  <div className={styles.title}>
+                    {site?.title ?? "KrnlBlog X64"}
+                  </div>
+                </div>
+                {site?.description && (
+                  <div className={styles.desc}>{site.description}</div>
+                )}
+              </div>
+              <div className={styles.navBelow}>
+                <div className={styles.desktopNav}>
+                  <TabList selectedValue={currentTab}>
+                    <Tab value="home">
+                      <a
+                        className={styles.navLink}
+                        href="/"
+                        onClick={(e) => delayedNavigate(navigate, "/", e)}
+                      >
+                        首页
+                      </a>
+                    </Tab>
+                    <Tab value="archive">
+                      <a
+                        className={styles.navLink}
+                        href="/archive"
+                        onClick={(e) => delayedNavigate(navigate, "/archive", e)}
+                      >
+                        归档
+                      </a>
+                    </Tab>
+                    <Tab value="search">
+                      <a
+                        className={styles.navLink}
+                        href="/search"
+                        onClick={(e) => delayedNavigate(navigate, "/search", e)}
+                      >
+                        搜索
+                      </a>
+                    </Tab>
+                    <Tab value="about">
+                      <a
+                        className={styles.navLink}
+                        href={site?.aboutMenuHref || "/about"}
+                        onClick={(e) =>
+                          delayedNavigate(
+                            navigate,
+                            site?.aboutMenuHref || "/about",
+                            e,
+                          )
+                        }
+                      >
+                        关于
+                      </a>
+                    </Tab>
+                  </TabList>
+                </div>
+              </div>
+            </header>
+
+            <main className={styles.mainWrap}>
+              <div className={styles.container}>{children}</div>
+              {!isMobile && (
+                <aside className={styles.sidebar}>
+                  {/* 目录 */}
+                  {toc.length > 0 && (
+                    <section
                       style={{
-                        fontSize: 13,
-                        color: tokens.colorNeutralForeground3,
+                        marginBottom: 32,
+                        paddingBottom: 20,
+                        borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
                       }}
                     >
-                      {site.author.bio}
+                      <div
+                        style={{
+                          fontSize: 16,
+                          fontWeight: 600,
+                          marginBottom: 12,
+                          color: tokens.colorBrandForeground1,
+                        }}
+                      >
+                        📑 目录
+                      </div>
+                      <nav>
+                        <ul
+                          style={{ margin: 0, padding: 0, listStyle: "none" }}
+                        >
+                          {toc.map((item) => (
+                            <li
+                              key={item.id}
+                              style={{
+                                marginLeft: (item.level - 2) * 12,
+                                marginTop: 6,
+                              }}
+                            >
+                              <a
+                                href={`#${item.id}`}
+                                style={{
+                                  color: tokens.colorNeutralForeground2,
+                                  textDecoration: "none",
+                                  fontSize: 14,
+                                  display: "block",
+                                  transition: "color 0.2s",
+                                }}
+                                onMouseEnter={(e) =>
+                                  (e.currentTarget.style.color =
+                                    tokens.colorBrandForeground1)
+                                }
+                                onMouseLeave={(e) =>
+                                  (e.currentTarget.style.color =
+                                    tokens.colorNeutralForeground2)
+                                }
+                              >
+                                {item.text}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </nav>
+                    </section>
+                  )}
+
+                  {/* 作者信息块 */}
+                  {site?.author && (
+                    <section
+                      style={{
+                        marginBottom: 32,
+                        paddingBottom: 20,
+                        borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 12,
+                        }}
+                      >
+                        <img
+                          src={site.author.avatar || site.icon || "/vite.svg"}
+                          alt="avatar"
+                          style={{
+                            width: 48,
+                            height: 48,
+                            borderRadius: "50%",
+                            objectFit: "cover",
+                          }}
+                        />
+                        <div>
+                          <div style={{ fontWeight: 600 }}>
+                            {site.author.name}
+                          </div>
+                          <div
+                            style={{
+                              fontSize: 13,
+                              color: tokens.colorNeutralForeground3,
+                            }}
+                          >
+                            {site.author.bio}
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+                  )}
+
+                  {/* 公告块 */}
+                  <section style={{ marginBottom: 32, paddingBottom: 20 }}>
+                    <div
+                      style={{
+                        fontSize: 16,
+                        fontWeight: 600,
+                        marginBottom: 8,
+                      }}
+                    >
+                      📢 公告
+                    </div>
+                    <div style={{ fontSize: 14 }}>
+                      <RenderedPage html={notice?.html || ""} />
+                    </div>
+                  </section>
+                </aside>
+              )}
+            </main>
+
+            {isMobile && (
+              <div
+                style={{
+                  maxWidth: 600,
+                  margin: "0 auto",
+                  width: "100%",
+                  padding: "16px 0",
+                }}
+              >
+                <div
+                  style={{
+                    background: tokens.colorNeutralBackground2,
+                    borderRadius: 12,
+                    boxShadow: tokens.shadow8,
+                    padding: 20,
+                    margin: "0 16px",
+                  }}
+                >
+                  {site?.author && (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 12,
+                        marginBottom: 16,
+                        borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
+                        paddingBottom: 12,
+                      }}
+                    >
+                      <img
+                        src={site.author.avatar || site.icon || "/vite.svg"}
+                        alt="avatar"
+                        style={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: "50%",
+                          objectFit: "cover",
+                        }}
+                      />
+                      <div>
+                        <div style={{ fontWeight: 600 }}>
+                          {site.author.name}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 13,
+                            color: tokens.colorNeutralForeground3,
+                          }}
+                        >
+                          {site.author.bio}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <div>
+                    <div
+                      style={{
+                        fontSize: 16,
+                        fontWeight: 600,
+                        marginBottom: 8,
+                      }}
+                    >
+                      📢 公告
+                    </div>
+                    <div style={{ fontSize: 14 }}>
+                      <RenderedPage html={notice?.html || ""} />
                     </div>
                   </div>
                 </div>
-              )}
-              <div>
-                <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>
-                  📢 公告
-                </div>
-                <div style={{ fontSize: 14 }}>
-                  <RenderedPage html={notice?.html || ""} />
-                </div>
               </div>
-            </div>
-          </div>
-        )}
+            )}
 
-        <footer className={styles.footer}>
-          <span
-            dangerouslySetInnerHTML={{
-              __html: site?.footer || "Powered by React + Fluent UI + Vite",
-            }}
-          />
-        </footer>
+            <footer className={styles.footer}>
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: site?.footer || "Powered by React + Fluent UI + Vite",
+                }}
+              />
+            </footer>
 
-        {/* 手机端抽屉菜单 */}
-        <Drawer
-          type="overlay"
-          position="start"
-          open={isDrawerOpen}
-          onOpenChange={(_, { open }) => setIsDrawerOpen(open)}
-        >
-          <DrawerHeader>
-            <DrawerHeaderTitle
-              action={
-                <Button
-                  appearance="subtle"
-                  aria-label="关闭"
-                  icon={<Dismiss24Regular />}
-                  onClick={() => setIsDrawerOpen(false)}
-                />
-              }
+            {/* 手机端抽屉菜单 */}
+            <Drawer
+              type="overlay"
+              position="start"
+              open={isDrawerOpen}
+              onOpenChange={(_, { open }) => setIsDrawerOpen(false)}
             >
-              菜单
-            </DrawerHeaderTitle>
-          </DrawerHeader>
-          <DrawerBody>
-            <nav className={styles.drawerNav}>
-              <a
-                href="/"
-                className={`${styles.drawerNavItem} ${
-                  currentTab === "home" ? styles.drawerNavItemActive : ""
-                }`}
-                onClick={(e) => {
-                  delayedNavigate(navigate, "/", e);
-                  setIsDrawerOpen(false);
-                }}
-              >
-                🏠 首页
-              </a>
-              <a
-                href="/archive"
-                className={`${styles.drawerNavItem} ${
-                  currentTab === "archive" ? styles.drawerNavItemActive : ""
-                }`}
-                onClick={(e) => {
-                  delayedNavigate(navigate, "/archive", e);
-                  setIsDrawerOpen(false);
-                }}
-              >
-                📚 归档
-              </a>
-              <a
-                href="/search"
-                className={`${styles.drawerNavItem} ${
-                  currentTab === "search" ? styles.drawerNavItemActive : ""
-                }`}
-                onClick={(e) => {
-                  delayedNavigate(navigate, "/search", e);
-                  setIsDrawerOpen(false);
-                }}
-              >
-                🔍 搜索
-              </a>
-              <a
-                href={site?.aboutMenuHref || "/about"}
-                className={`${styles.drawerNavItem} ${
-                  currentTab === "about" ? styles.drawerNavItemActive : ""
-                }`}
-                onClick={(e) => {
-                  delayedNavigate(navigate, site?.aboutMenuHref || "/about", e);
-                  setIsDrawerOpen(false);
-                }}
-              >
-                ℹ️ 关于
-              </a>
-              <div
-                style={{
-                  borderTop: `1px solid ${tokens.colorNeutralStroke2}`,
-                  marginTop: tokens.spacingVerticalM,
-                  paddingTop: tokens.spacingVerticalM,
-                }}
-              >
-                <Button
-                  appearance="subtle"
-                  onClick={() => {
-                    toggleTheme();
-                    setIsDrawerOpen(false);
-                  }}
-                  style={{ width: "100%", justifyContent: "flex-start" }}
+              <DrawerHeader>
+                <DrawerHeaderTitle
+                  action={
+                    <Button
+                      appearance="subtle"
+                      aria-label="关闭"
+                      icon={<Dismiss24Regular />}
+                      onClick={() => setIsDrawerOpen(false)}
+                    />
+                  }
                 >
-                  {isDark ? "🌞 切换亮色模式" : "🌙 切换深色模式"}
-                </Button>
-              </div>
-            </nav>
-          </DrawerBody>
-        </Drawer>
+                  菜单
+                </DrawerHeaderTitle>
+              </DrawerHeader>
+              <DrawerBody>
+                <nav className={styles.drawerNav}>
+                  <a
+                    href="/"
+                    className={`${styles.drawerNavItem} ${
+                      currentTab === "home" ? styles.drawerNavItemActive : ""
+                    }`}
+                    onClick={(e) => {
+                      delayedNavigate(navigate, "/", e);
+                      setIsDrawerOpen(false);
+                    }}
+                  >
+                    🏠 首页
+                  </a>
+                  <a
+                    href="/archive"
+                    className={`${styles.drawerNavItem} ${
+                      currentTab === "archive" ? styles.drawerNavItemActive : ""
+                    }`}
+                    onClick={(e) => {
+                      delayedNavigate(navigate, "/archive", e);
+                      setIsDrawerOpen(false);
+                    }}
+                  >
+                    📚 归档
+                  </a>
+                  <a
+                    href="/search"
+                    className={`${styles.drawerNavItem} ${
+                      currentTab === "search" ? styles.drawerNavItemActive : ""
+                    }`}
+                    onClick={(e) => {
+                      delayedNavigate(navigate, "/search", e);
+                      setIsDrawerOpen(false);
+                    }}
+                  >
+                    🔍 搜索
+                  </a>
+                  <a
+                    href={site?.aboutMenuHref || "/about"}
+                    className={`${styles.drawerNavItem} ${
+                      currentTab === "about" ? styles.drawerNavItemActive : ""
+                    }`}
+                    onClick={(e) => {
+                      delayedNavigate(
+                        navigate,
+                        site?.aboutMenuHref || "/about",
+                        e,
+                      );
+                      setIsDrawerOpen(false);
+                    }}
+                  >
+                    ℹ️ 关于
+                  </a>
+                  <div
+                    style={{
+                      borderTop: `1px solid ${tokens.colorNeutralStroke2}`,
+                      marginTop: tokens.spacingVerticalM,
+                      paddingTop: tokens.spacingVerticalM,
+                    }}
+                  >
+                    <Button
+                      appearance="subtle"
+                      onClick={() => {
+                        toggleTheme();
+                        setIsDrawerOpen(false);
+                      }}
+                      style={{ width: "100%", justifyContent: "flex-start" }}
+                    >
+                      {isDark ? "🌞 切换亮色模式" : "🌙 切换深色模式"}
+                    </Button>
+                  </div>
+                </nav>
+              </DrawerBody>
+            </Drawer>
 
-        {ctx.open && (
-          <>
-            <div
-              className={styles.contextBackdrop}
-              onClick={closeContextMenu}
-            />
-            <div
-              className={styles.contextMenu}
-              style={{ left: ctx.x, top: ctx.y }}
-              onClick={closeContextMenu}
-            >
-              <Button appearance="subtle" onClick={() => toggleTheme()}>
-                切换深浅色
-              </Button>
-            </div>
+            {ctx.open && (
+              <>
+                <div
+                  className={styles.contextBackdrop}
+                  onClick={closeContextMenu}
+                />
+                <div
+                  className={styles.contextMenu}
+                  style={{ left: ctx.x, top: ctx.y }}
+                  onClick={closeContextMenu}
+                >
+                  <Button appearance="subtle" onClick={() => toggleTheme()}>
+                    切换深浅色
+                  </Button>
+                </div>
+              </>
+            )}
           </>
         )}
       </FluentProvider>
     </>
   );
+
 }
