@@ -10,7 +10,7 @@ tags: ["Blog", "Think"]
 
 很好，让我回想一下我的过去。
 
-...
+---
 
 going way back to 2022.
 
@@ -56,3 +56,7 @@ in case you ask me who she is. not going to say.
 ---
 
 也许我有赛博暴露癖，把这种私密的东西扔到公开的博客上。不过这很有趣，不是吗？
+
+---
+
+*和 Wormwaker 说的`我喜欢你`只是开玩笑的，别当真
