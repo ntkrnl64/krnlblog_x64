@@ -641,7 +641,7 @@ export function Layout({ children }: PropsWithChildren) {
               type="overlay"
               position="start"
               open={isDrawerOpen}
-              onOpenChange={(_, { open }) => setIsDrawerOpen(false)}
+              onOpenChange={(_, { }) => setIsDrawerOpen(false)}
             >
               <DrawerHeader>
                 <DrawerHeaderTitle
