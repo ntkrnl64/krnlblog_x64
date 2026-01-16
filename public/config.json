@@ -2,11 +2,11 @@
   "siteUrl": "https://blog.krnl64.win",
   "title": "KrnlBlog X64",
   "description": "Krnl's Fluent Blog",
-  "icon": "/avatar.png",
+  "icon": "https://assets.krnl64.win/avatar.png",
   "author": {
     "name": "NtKrnl64",
     "bio": "Developer",
-    "avatar": "/avatar.png",
+    "avatar": "https://assets.krnl64.win/avatar.png",
     "email": "nt@krnl64.win",
     "social": {
       "github": "https://github.com/ntkrnl64"
