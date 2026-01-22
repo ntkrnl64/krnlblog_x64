@@ -2,7 +2,7 @@
 slug: self
 title: 我自己
 summary: 我不知道
-publishedAt: 1026-01-22
+publishedAt: 2026-01-22
 tags: ["Blog"]
 ---
 
