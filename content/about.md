@@ -22,8 +22,8 @@ summary: 关于本博客
 
 欢迎通过以下方式联系：
 
-- Email: nt@krnl64.win
-- GitHub: [NtKrnl64](https://github.com/ntktnl64)
+- Email: [nt@k****4.win](https://email.krnl64.win/base64/bnRAa3JubDY0Lndpbg)
+- GitHub: [NtKrnl64](https://github.com/ntkrnl64)
 
 ---
 
